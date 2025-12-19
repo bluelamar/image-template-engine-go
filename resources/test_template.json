@@ -1,0 +1,58 @@
+{
+  "template_image": "resources/test.png",
+  "output": {
+    "width": 1024,
+    "height": 1536,
+    "format": "png"
+  },
+  "slots": [
+    {
+      "id": "motif",
+      "x": 512,
+      "y": 190,
+      "width": 1000,
+      "height": 450,
+      "mask": "circle",
+      "anchor_x": 0.5,
+      "anchor_y": 0.5,
+      "opacity": 0.75
+    },
+    {
+      "id": "name_a",
+      "x": 200,
+      "y": 775,
+      "width": 100,
+      "height": 200,
+      "is_text": true,
+      "text_opts": {
+        "font_path": "", 
+        "font_size": 36,
+        "color": "#eded11",
+        "align_x": "center",
+        "align_y": "middle",
+        "wrap": false
+      },
+      "anchor_x": 0.5,
+      "anchor_y": 0.5
+    },
+    {
+      "id": "name_b",
+      "x": 620,
+      "y": 775,
+      "width": 100,
+      "height": 200,
+      "is_text": true,
+      "text_opts": {
+        "font_path": "", 
+        "font_size": 36,
+        "color": "#eded11",
+        "align_x": "center",
+        "align_y": "middle",
+        "wrap": false
+      },
+      "anchor_x": 0.5,
+      "anchor_y": 0.5
+    }
+  ]
+}
+
