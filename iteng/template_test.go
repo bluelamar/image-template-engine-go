@@ -42,7 +42,7 @@ func TestParseInputs(t *testing.T) {
 }
 
 func TestParseTemplate(t *testing.T) {
-	templateFile := "../resources/test_template.html"
+	templateFile := "../resources/test_template.json"
 	templ, err := ParseTemplate(templateFile)
 	if err != nil {
 		t.Errorf("ParseTemplate failed with error: %v", err)
@@ -51,19 +51,21 @@ func TestParseTemplate(t *testing.T) {
 		t.Errorf("Expected non-empty template, but got empty string")
 	}
 
-	ti := templ.TemplateImage
-
-	ooutput := ti.Output
-	if expected := "output.png"; output != expected {
-		t.Errorf("Expected output to be '%s', but got '%s'", expected, output)
+	if templ.TemplateImage != "resources/sun_and_moon_100x100.png" {
+		t.Errorf("Expected template image to be '%s', but got '%s'", templateFile, templ.TemplateImage)
 	}
 
-	expected := ti.Width
-	if expected := 800; width != expected {
+	output := templ.Output
+	if expected := "png"; output.Format != expected {
+		t.Errorf("Expected output to be '%s', but got '%s'", expected, output.Format)
+	}
+
+	width := output.Width
+	if expected := 1024; width != expected {
 		t.Errorf("Expected width to be %d, but got %d", expected, width)
 	}
 
-	height := ti.Height
+	height := output.Height
 	if expected := 600; height != expected {
 		t.Errorf("Expected height to be %d, but got %d", expected, height)
 	}

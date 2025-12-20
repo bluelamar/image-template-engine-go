@@ -27,7 +27,9 @@ import (
 	"strings"
 
 	"github.com/fogleman/gg"
+	"golang.org/x/image/bmp"
 	imagedraw "golang.org/x/image/draw"
+	"golang.org/x/image/tiff"
 )
 
 // LoadImageFromFile decodes common image formats
@@ -61,6 +63,10 @@ func SaveImageToFile(img image.Image, outpath, format string) error {
 		return jpeg.Encode(out, img, &jpeg.Options{Quality: 92})
 	case "gif":
 		return gif.Encode(out, img, nil)
+	case "tiff":
+		return tiff.Encode(out, img, nil)
+	case "bmp":
+		return bmp.Encode(out, img)
 	default:
 		// fallback to png
 		enc := png.Encoder{CompressionLevel: png.BestCompression}

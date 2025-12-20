@@ -1,8 +1,8 @@
 {
-  "template_image": "resources/test.png",
+  "template_image": "resources/sun_and_moon_100x100.png",
   "output": {
     "width": 1024,
-    "height": 1536,
+    "height": 600,
     "format": "png"
   },
   "slots": [

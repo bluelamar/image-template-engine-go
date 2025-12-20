@@ -74,3 +74,234 @@ func Test_maxf(t *testing.T) {
 		}
 	}
 }
+
+func Test_LoadImageFromFile(t *testing.T) {
+	// Test loading an image from a file
+	imagePath := "../resources/sun_and_moon_100x100.png"
+	image, err := LoadImageFromFile(imagePath)
+	if err != nil {
+		t.Errorf("LoadImageFromFile(%s) returned error: %v", imagePath, err)
+	}
+	if image == nil {
+		t.Errorf("LoadImageFromFile(%s) returned nil image", imagePath)
+	}
+
+	// Non-existant file
+	imagePath = "non-existant-file.png"
+	_, err = LoadImageFromFile(imagePath)
+	if err != nil {
+		t.Logf("Success: LoadImageFromFile(%s) should return an error: %v", imagePath, err)
+	} else {
+		t.Errorf("LoadImageFromFile(%s) should have returned an error but didnt", imagePath)
+	}
+
+	// Invalid image file format
+	imagePath = "../resources/test_template.json"
+	_, err = LoadImageFromFile(imagePath)
+	if err != nil {
+		t.Logf("Success: LoadImageFromFile(%s) returned error: %v", imagePath, err)
+	} else {
+		t.Errorf("LoadImageFromFile(%s) should have returned an error but didnt", imagePath)
+	}
+}
+
+func Test_jpg_LoadImageFromFile(t *testing.T) {
+	// Test loading a jpg image from a file
+	imagePath := "../resources/sun_and_moon_100x100.jpg"
+	image, err := LoadImageFromFile(imagePath)
+	if err != nil {
+		t.Errorf("LoadImageFromFile(%s) returned error: %v", imagePath, err)
+	}
+	if image == nil {
+		t.Errorf("LoadImageFromFile(%s) returned nil image", imagePath)
+	}
+}
+
+func Test_tiff_LoadImageFromFile(t *testing.T) {
+	// Test loading a tiff image from a file
+	imagePath := "../resources/sun_and_moon_100x100.tiff"
+	image, err := LoadImageFromFile(imagePath)
+	if err != nil {
+		t.Errorf("LoadImageFromFile(%s) returned error: %v", imagePath, err)
+	}
+	if image == nil {
+		t.Errorf("LoadImageFromFile(%s) returned nil image", imagePath)
+	}
+}
+
+func Test_png_ResizeImage(t *testing.T) {
+	// Test resizing an image
+	imagePath := "../resources/sun_and_moon_100x100.png"
+	image, err := LoadImageFromFile(imagePath)
+	if err != nil {
+		t.Errorf("LoadImageFromFile(%s) returned error: %v", imagePath, err)
+	}
+	if image == nil {
+		t.Errorf("LoadImageFromFile(%s) returned nil image", imagePath)
+	}
+
+	// Resize the image to 50x50
+	resizedImage := ResizeImage(image, 50, 50, ResizeModeFill)
+	if err != nil {
+		t.Errorf("ResizeImage(%v, 50, 50, ResizeModeFill) returned error: %v", image, err)
+	}
+	if resizedImage == nil {
+		t.Errorf("ResizeImage(%v, 50, 50) returned nil image", image)
+	}
+
+	// Check the dimensions of the resized image
+	if resizedImage.Bounds().Dx() != 50 || resizedImage.Bounds().Dy() != 50 {
+		t.Errorf("ResizeImage(%v, 50, 50, ResizeModeFill) returned image with incorrect dimensions", image)
+	}
+
+	// Test resizing an image to a larger size
+	resizedImage = ResizeImage(image, 2000, 2000, ResizeModeFill)
+	if resizedImage == nil {
+		t.Errorf("ResizeImage(%v, 2000, 2000, ResizeModeFill) returned nil image", image)
+	}
+
+	// Check the dimensions of the resized image
+	if resizedImage.Bounds().Dx() > 2000 || resizedImage.Bounds().Dy() > 2000 {
+		t.Errorf("ResizeImage(%v, 2000, 2000, ResizeModeFill) returned image with incorrect dimensions", image)
+	}
+
+	// ResizeModeFit
+	resizedImage = ResizeImage(image, 2000, 2000, ResizeModeFit)
+	if resizedImage == nil {
+		t.Errorf("ResizeImage(%v, 2000, 2000, ResizeModeFit) returned nil image", image)
+	}
+
+	// Check the dimensions of the resized image
+	if resizedImage.Bounds().Dx() > 2000 || resizedImage.Bounds().Dy() > 2000 {
+		t.Errorf("ResizeImage(%v, 2000, 2000, ResizeModeFit) returned image with incorrect dimensions", image)
+	}
+
+	// ResizeModeCover
+	resizedImage = ResizeImage(image, 50, 50, ResizeModeCover)
+	if resizedImage == nil {
+		t.Errorf("ResizeImage(%v, 50, 50, ResizeModeCover) returned nil image", image)
+	}
+
+	// Check the dimensions of the resized image
+	if resizedImage.Bounds().Dx() > 50 || resizedImage.Bounds().Dy() > 50 {
+		t.Errorf("ResizeImage(%v, 50, 50, ResizeModeCover) returned image with incorrect dimensions", image)
+	}
+}
+
+func Test_jpg_ResizeImage(t *testing.T) {
+	// Test resizing an image
+	imagePath := "../resources/sun_and_moon_100x100.jpg"
+	image, err := LoadImageFromFile(imagePath)
+	if err != nil {
+		t.Errorf("LoadImageFromFile(%s) returned error: %v", imagePath, err)
+	}
+	if image == nil {
+		t.Errorf("LoadImageFromFile(%s) returned nil image", imagePath)
+	}
+
+	// Resize the image to 50x50
+	resizedImage := ResizeImage(image, 50, 50, ResizeModeFill)
+	if err != nil {
+		t.Errorf("ResizeImage(%v, 50, 50, ResizeModeFill) returned error: %v", image, err)
+	}
+	if resizedImage == nil {
+		t.Errorf("ResizeImage(%v, 50, 50) returned nil image", image)
+	}
+
+	// Check the dimensions of the resized image
+	if resizedImage.Bounds().Dx() != 50 || resizedImage.Bounds().Dy() != 50 {
+		t.Errorf("ResizeImage(%v, 50, 50, ResizeModeFill) returned image with incorrect dimensions", image)
+	}
+
+	// Test resizing an image to a larger size
+	resizedImage = ResizeImage(image, 2000, 2000, ResizeModeFit)
+	if resizedImage == nil {
+		t.Errorf("ResizeImage(%v, 2000, 2000, ResizeModeFit) returned nil image", image)
+	}
+
+	// Check the dimensions of the resized image
+	if resizedImage.Bounds().Dx() > 2000 || resizedImage.Bounds().Dy() > 2000 {
+		t.Errorf("ResizeImage(%v, 2000, 2000, ResizeModeFit) returned image with incorrect dimensions", image)
+	}
+
+	// ResizeModeFit
+	resizedImage = ResizeImage(image, 2000, 2000, ResizeModeFit)
+	if resizedImage == nil {
+		t.Errorf("ResizeImage(%v, 2000, 2000, ResizeModeFit) returned nil image", image)
+	}
+
+	// Check the dimensions of the resized image
+	if resizedImage.Bounds().Dx() > 2000 || resizedImage.Bounds().Dy() > 2000 {
+		t.Errorf("ResizeImage(%v, 2000, 2000, ResizeModeFit) returned image with incorrect dimensions", image)
+	}
+
+	// ResizeModeCover
+	resizedImage = ResizeImage(image, 50, 50, ResizeModeCover)
+	if resizedImage == nil {
+		t.Errorf("ResizeImage(%v, 50, 50, ResizeModeCover) returned nil image", image)
+	}
+
+	// Check the dimensions of the resized image
+	if resizedImage.Bounds().Dx() > 50 || resizedImage.Bounds().Dy() > 50 {
+		t.Errorf("ResizeImage(%v, 50, 50, ResizeModeCover) returned image with incorrect dimensions", image)
+	}
+}
+
+func Test_tiff_ResizeImage(t *testing.T) {
+	// Test resizing an image
+	imagePath := "../resources/sun_and_moon_100x100.tiff"
+	image, err := LoadImageFromFile(imagePath)
+	if err != nil {
+		t.Errorf("LoadImageFromFile(%s) returned error: %v", imagePath, err)
+	}
+	if image == nil {
+		t.Errorf("LoadImageFromFile(%s) returned nil image", imagePath)
+	}
+
+	// Resize the image to 50x50
+	resizedImage := ResizeImage(image, 50, 50, ResizeModeFill)
+	if err != nil {
+		t.Errorf("ResizeImage(%v, 50, 50, ResizeModeFill) returned error: %v", image, err)
+	}
+	if resizedImage == nil {
+		t.Errorf("ResizeImage(%v, 50, 50) returned nil image", image)
+	}
+
+	// Check the dimensions of the resized image
+	if resizedImage.Bounds().Dx() != 50 || resizedImage.Bounds().Dy() != 50 {
+		t.Errorf("ResizeImage(%v, 50, 50, ResizeModeFill) returned image with incorrect dimensions", image)
+	}
+
+	// Test resizing an image to a larger size
+	resizedImage = ResizeImage(image, 2000, 2000, ResizeModeFit)
+	if resizedImage == nil {
+		t.Errorf("ResizeImage(%v, 2000, 2000, ResizeModeFit) returned nil image", image)
+	}
+
+	// Check the dimensions of the resized image
+	if resizedImage.Bounds().Dx() > 2000 || resizedImage.Bounds().Dy() > 2000 {
+		t.Errorf("ResizeImage(%v, 2000, 2000, ResizeModeFit) returned image with incorrect dimensions", image)
+	}
+
+	// ResizeModeFit
+	resizedImage = ResizeImage(image, 2000, 2000, ResizeModeFit)
+	if resizedImage == nil {
+		t.Errorf("ResizeImage(%v, 2000, 2000, ResizeModeFit) returned nil image", image)
+	}
+
+	// Check the dimensions of the resized image
+	if resizedImage.Bounds().Dx() > 2000 || resizedImage.Bounds().Dy() > 2000 {
+		t.Errorf("ResizeImage(%v, 2000, 2000, ResizeModeFit) returned image with incorrect dimensions", image)
+	}
+
+	// ResizeModeCover
+	resizedImage = ResizeImage(image, 50, 50, ResizeModeCover)
+	if resizedImage == nil {
+		t.Errorf("ResizeImage(%v, 50, 50, ResizeModeCover) returned nil image", image)
+	}
+
+	// Check the dimensions of the resized image
+	if resizedImage.Bounds().Dx() > 50 || resizedImage.Bounds().Dy() > 50 {
+		t.Errorf("ResizeImage(%v, 50, 50, ResizeModeCover) returned image with incorrect dimensions", image)
+	}
+}
