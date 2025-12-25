@@ -19,7 +19,7 @@ import (
 )
 
 func TestParseInputs(t *testing.T) {
-	inputFile := "../resources/test_input.json"
+	inputFile := "../test/test_input.json"
 	inputs, err := ParseInputs(inputFile)
 	if err != nil {
 		t.Errorf("ParseInputs failed with error: %v", err)
@@ -27,8 +27,8 @@ func TestParseInputs(t *testing.T) {
 	if len(inputs) != 5 {
 		t.Errorf("Expected 5 inputs, but got %d", len(inputs))
 	}
-	if inputs["motif"] != "./resources/arrow_100x100.png" {
-		t.Errorf("Expected motif to be './resources/arrow_100x100.png', but got '%s'", inputs["motif"])
+	if inputs["motif"] != "./test/arrow_100x100.png" {
+		t.Errorf("Expected motif to be './test/arrow_100x100.png', but got '%s'", inputs["motif"])
 	}
 	if inputs["title"] != "Introducing Text Rendering" {
 		t.Errorf("Expected title to be 'Introducing Text Rendering', but got '%s'", inputs["title"])
@@ -45,7 +45,7 @@ func TestParseInputs(t *testing.T) {
 }
 
 func TestParseTemplate(t *testing.T) {
-	templateFile := "../resources/test_template.json"
+	templateFile := "../test/test_template.json"
 	templ, err := ParseTemplate(templateFile)
 	if err != nil {
 		t.Errorf("ParseTemplate failed with error: %v", err)
@@ -54,7 +54,7 @@ func TestParseTemplate(t *testing.T) {
 		t.Errorf("Expected non-empty template, but got empty string")
 	}
 
-	if templ.TemplateImage != "resources/sun_and_moon_100x100.png" {
+	if templ.TemplateImage != "test/sun_and_moon_100x100.png" {
 		t.Errorf("Expected template image to be '%s', but got '%s'", templateFile, templ.TemplateImage)
 	}
 

@@ -128,7 +128,7 @@ func Test_maxf(t *testing.T) {
 
 func Test_LoadImageFromFile(t *testing.T) {
 	// Test loading an image from a file
-	imagePath := "../resources/sun_and_moon_100x100.png"
+	imagePath := "../test/sun_and_moon_100x100.png"
 	image, err := LoadImageFromFile(imagePath)
 	if err != nil {
 		t.Errorf("LoadImageFromFile(%s) returned error: %v", imagePath, err)
@@ -147,7 +147,7 @@ func Test_LoadImageFromFile(t *testing.T) {
 	}
 
 	// Invalid image file format
-	imagePath = "../resources/test_template.json"
+	imagePath = "../test/test_template.json"
 	_, err = LoadImageFromFile(imagePath)
 	if err != nil {
 		t.Logf("Success: LoadImageFromFile(%s) returned error: %v", imagePath, err)
@@ -158,7 +158,7 @@ func Test_LoadImageFromFile(t *testing.T) {
 
 func Test_jpg_LoadImageFromFile(t *testing.T) {
 	// Test loading a jpg image from a file
-	imagePath := "../resources/sun_and_moon_100x100.jpg"
+	imagePath := "../test/sun_and_moon_100x100.jpg"
 	image, err := LoadImageFromFile(imagePath)
 	if err != nil {
 		t.Errorf("LoadImageFromFile(%s) returned error: %v", imagePath, err)
@@ -170,7 +170,7 @@ func Test_jpg_LoadImageFromFile(t *testing.T) {
 
 func Test_tiff_LoadImageFromFile(t *testing.T) {
 	// Test loading a tiff image from a file
-	imagePath := "../resources/sun_and_moon_100x100.tiff"
+	imagePath := "../test/sun_and_moon_100x100.tiff"
 	image, err := LoadImageFromFile(imagePath)
 	if err != nil {
 		t.Errorf("LoadImageFromFile(%s) returned error: %v", imagePath, err)
@@ -182,7 +182,7 @@ func Test_tiff_LoadImageFromFile(t *testing.T) {
 
 func Test_png_ResizeImage(t *testing.T) {
 	// Test resizing an image
-	imagePath := "../resources/sun_and_moon_100x100.png"
+	imagePath := "../test/sun_and_moon_100x100.png"
 	image, err := LoadImageFromFile(imagePath)
 	if err != nil {
 		t.Errorf("LoadImageFromFile(%s) returned error: %v", imagePath, err)
@@ -241,7 +241,7 @@ func Test_png_ResizeImage(t *testing.T) {
 
 func Test_jpg_ResizeImage(t *testing.T) {
 	// Test resizing an image
-	imagePath := "../resources/sun_and_moon_100x100.jpg"
+	imagePath := "../test/sun_and_moon_100x100.jpg"
 	image, err := LoadImageFromFile(imagePath)
 	if err != nil {
 		t.Errorf("LoadImageFromFile(%s) returned error: %v", imagePath, err)
@@ -300,7 +300,7 @@ func Test_jpg_ResizeImage(t *testing.T) {
 
 func Test_tiff_ResizeImage(t *testing.T) {
 	// Test resizing an image
-	imagePath := "../resources/sun_and_moon_100x100.tiff"
+	imagePath := "../test/sun_and_moon_100x100.tiff"
 	image, err := LoadImageFromFile(imagePath)
 	if err != nil {
 		t.Errorf("LoadImageFromFile(%s) returned error: %v", imagePath, err)
@@ -486,7 +486,7 @@ func Test_DrawTextInto_BasicText(t *testing.T) {
 			FontSize:   20,
 			Color:      "#000000",
 			FontSource: "file",
-			FontPath:   "../resources/NotoSansPhoenician-Regular.ttf",
+			FontPath:   "../test/NotoSansPhoenician-Regular.ttf",
 		},
 	}
 
@@ -511,7 +511,7 @@ func Test_DrawTextInto_WithColor(t *testing.T) {
 			FontSize:   20,
 			Color:      "#FF0000", // Red
 			FontSource: "file",
-			FontPath:   "../resources/NotoSansTagalog-Regular.ttf",
+			FontPath:   "../test/NotoSansTagalog-Regular.ttf",
 		},
 	}
 
@@ -534,7 +534,7 @@ func Test_DrawTextInto_WithDefaultColor(t *testing.T) {
 		TextOpts: TextOpt{
 			FontSize:   20,
 			FontSource: "file",
-			FontPath:   "../resources/LastResort.otf",
+			FontPath:   "../test/LastResort.otf",
 		},
 	}
 
@@ -855,7 +855,7 @@ func Test_DrawTextInto_WithEnvFontVars(t *testing.T) {
 
 	// Set test env vars
 	os.Setenv("ITENG_FONT_TTF", "NotoSansPhoenician-Regular.ttf")
-	os.Setenv("ITENG_FONT_DIR", "../resources")
+	os.Setenv("ITENG_FONT_DIR", "../test")
 
 	defer func() {
 		// Restore original env vars

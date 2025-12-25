@@ -35,7 +35,7 @@ go get github.com/bluelamar/image-template-engine-go@latest
 ## Usage
 
 
-## Example
+### Example
 
 See https://github.com/bluelamar/image-template-engine-go/tree/master/examples
 

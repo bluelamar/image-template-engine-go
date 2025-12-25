@@ -1,5 +1,5 @@
 {
-  "template_image": "resources/sun_and_moon_100x100.png",
+  "template_image": "test/sun_and_moon_100x100.png",
   "output": {
     "width": 1024,
     "height": 600,
@@ -26,7 +26,7 @@
       "is_text": true,
       "text_opts": {
         "font_source": "file",
-        "font_path": "../resources/NotoSansPhoenician-Regular.ttf", 
+        "font_path": "../test/NotoSansPhoenician-Regular.ttf", 
         "font_size": 36,
         "color": "#eded11",
         "align_x": "center",
@@ -45,7 +45,7 @@
       "is_text": true,
       "text_opts": {
         "font_source": "file",
-        "font_path": "../resources/NotoSansTagalog-Regular.ttf", 
+        "font_path": "../test/NotoSansTagalog-Regular.ttf", 
         "font_size": 36,
         "color": "#eded11",
         "align_x": "center",
@@ -64,7 +64,7 @@
       "is_text": true,
       "text_opts": {
         "font_source": "file",
-        "font_path": "../resources/LastResort.otf", 
+        "font_path": "../test/LastResort.otf", 
         "font_size": 36,
         "color": "#eded11",
         "align_x": "center",

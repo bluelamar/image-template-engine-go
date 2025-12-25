@@ -1,5 +1,5 @@
 {
-  "motif": "./resources/arrow_100x100.png",
+  "motif": "./test/arrow_100x100.png",
   "title": "Introducing Text Rendering",
   "sub_title": "Flexible, Configurable & High-Quality",
   "description": "This example shows how text rendering works",
