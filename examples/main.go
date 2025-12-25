@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/iteng-image/template-engine-go/iteng"
+	"github.com/bluelamar/image-template-engine-go/iteng"
 )
 
 /*
