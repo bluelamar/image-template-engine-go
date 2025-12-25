@@ -24,17 +24,20 @@ func TestParseInputs(t *testing.T) {
 	if err != nil {
 		t.Errorf("ParseInputs failed with error: %v", err)
 	}
-	if len(inputs) != 4 {
-		t.Errorf("Expected 4 inputs, but got %d", len(inputs))
+	if len(inputs) != 5 {
+		t.Errorf("Expected 5 inputs, but got %d", len(inputs))
+	}
+	if inputs["motif"] != "./resources/arrow_100x100.png" {
+		t.Errorf("Expected motif to be './resources/arrow_100x100.png', but got '%s'", inputs["motif"])
 	}
 	if inputs["title"] != "Introducing Text Rendering" {
 		t.Errorf("Expected title to be 'Introducing Text Rendering', but got '%s'", inputs["title"])
 	}
-	if inputs["subtitle"] != "Flexible, Configurable & High-Quality" {
-		t.Errorf("Expected subtitle to be 'Flexible, Configurable & High-Quality', but got '%s'", inputs["subtitle"])
+	if inputs["sub_title"] != "Flexible, Configurable & High-Quality" {
+		t.Errorf("Expected sub_title to be 'Flexible, Configurable & High-Quality', but got '%s'", inputs["sub_title"])
 	}
-	if inputs["body"] != "This example shows how text rendering works" {
-		t.Errorf("Expected body to be 'TThis example shows how text rendering works', but got '%s'", inputs["body"])
+	if inputs["description"] != "This example shows how text rendering works" {
+		t.Errorf("Expected description to be 'This example shows how text rendering works', but got '%s'", inputs["description"])
 	}
 	if inputs["footer"] != "Generated on 2025-02-15" {
 		t.Errorf("Expected footer to be 'Generated on 2025-02-15', but got '%s'", inputs["footer"])

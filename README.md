@@ -24,9 +24,21 @@ Resource image details:
 * DPI : 72 pixels/inch
 
 
+## Installation
+
+```bash
+# To get the latest released Go client:
+go get github.com/bluelamar/image-template-engine-go@latest
+```
+
+
 ## Usage
 
 
 ## Example
+
+See https://github.com/bluelamar/image-template-engine-go/tree/master/examples
+
+See the function **ImageDriver** in https://github.com/bluelamar/image-template-engine-go/tree/master/iteng/driver.go to see how to use the API.
 
 

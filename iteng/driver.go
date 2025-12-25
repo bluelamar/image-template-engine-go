@@ -25,7 +25,7 @@ import (
 	"github.com/fogleman/gg"
 )
 
-func driver(templatePath string, inputsPath string, outputPath string) error {
+func ImageDriver(templatePath string, inputsPath string, outputPath string) error {
 	tmpl, err := ParseTemplate(templatePath)
 	if err != nil {
 		return fmt.Errorf("parsing template: %v", err)

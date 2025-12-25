@@ -18,7 +18,7 @@
       "opacity": 0.75
     },
     {
-      "id": "name_a",
+      "id": "title",
       "x": 200,
       "y": 775,
       "width": 100,
@@ -37,7 +37,7 @@
       "anchor_y": 0.5
     },
     {
-      "id": "name_b",
+      "id": "sub_title",
       "x": 620,
       "y": 775,
       "width": 100,
