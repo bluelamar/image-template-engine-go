@@ -25,7 +25,8 @@
       "height": 200,
       "is_text": true,
       "text_opts": {
-        "font_path": "", 
+        "font_source": "file",
+        "font_path": "../resources/NotoSansPhoenician-Regular.ttf", 
         "font_size": 36,
         "color": "#eded11",
         "align_x": "center",
@@ -43,7 +44,27 @@
       "height": 200,
       "is_text": true,
       "text_opts": {
-        "font_path": "", 
+        "font_source": "file",
+        "font_path": "../resources/NotoSansTagalog-Regular.ttf", 
+        "font_size": 36,
+        "color": "#eded11",
+        "align_x": "center",
+        "align_y": "middle",
+        "wrap": false
+      },
+      "anchor_x": 0.5,
+      "anchor_y": 0.5
+    },
+    {
+      "id": "description",
+      "x": 410,
+      "y": 775,
+      "width": 125,
+      "height": 225,
+      "is_text": true,
+      "text_opts": {
+        "font_source": "file",
+        "font_path": "../resources/LastResort.otf", 
         "font_size": 36,
         "color": "#eded11",
         "align_x": "center",

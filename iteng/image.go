@@ -21,7 +21,9 @@ import (
 	"image/gif"
 	"image/jpeg"
 	"image/png"
+	"io"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
@@ -208,34 +210,182 @@ func min(a, b int) int {
 	return b
 }
 
-// DrawTextInto draws text into the canvas using gg and supports wrapping and alignment
-// Note: dc must be initialized with the correct size before calling this function
-// TODO: support vertical alignment
-// Note: gg.AlignLeft is used for simplicity; adjust as needed for other alignments
-// TODO: support more text options like line spacing, etc.
-// TODO: support loading fonts other than from filesystem
-func (slot Slot) DrawTextInto(dc *gg.Context, text string) {
-	// log.Printf("drawTextInto: slot: %v: text: %s", slot, text)
-	// Load font if provided
-	var err error
-	if slot.TextOpts.FontPath != "" {
-		err = dc.LoadFontFace(slot.TextOpts.FontPath, slot.TextOpts.FontSize)
-	} else {
-		// attempt to load default system font; if fails, gg has a builtin fallback
-		// FIX err = dc.LoadFontFace("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", slot.TextOpts.FontSize)
-		ttfFile := os.Getenv("FONT_TTF")
-		ttfPath := filepath.Join(os.Getenv("FONT_DIR"), ttfFile)
-		err = dc.LoadFontFace(ttfPath, slot.TextOpts.FontSize)
+// loadFontFromURL downloads a font from a URL and returns the font bytes
+func loadFontFromURL(url string) ([]byte, error) {
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, err
 	}
 
+	return io.ReadAll(resp.Body)
+}
+
+// loadFontFromSystem attempts to load a system font by name
+// Tries common system font directories for the given font name
+func loadFontFromSystem(fontName string) ([]byte, error) {
+	// Common system font directories
+	fontDirs := []string{
+		"/usr/share/fonts/truetype",     // Linux : ex: /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
+		"/System/Library/Fonts",         // macOS
+		"/Library/Fonts",                // macOS
+		"C:\\Windows\\Fonts",            // Windows
+		os.ExpandEnv("$WINDIR\\Fonts"),  // Windows via env var
+		os.ExpandEnv("$ITENG_FONT_DIR"), // Custom font dir via env var
+	}
+
+	// Common font file extensions
+	extensions := []string{".ttf", ".otf"}
+
+	for _, dir := range fontDirs {
+		for _, ext := range extensions {
+			fontPath := filepath.Join(dir, fontName+ext)
+			if data, err := os.ReadFile(fontPath); err == nil {
+				return data, nil
+			}
+
+			// Try with different case variations on case-insensitive systems
+			fontPath = filepath.Join(dir, strings.ToLower(fontName)+ext)
+			if data, err := os.ReadFile(fontPath); err == nil {
+				return data, nil
+			}
+		}
+	}
+
+	return nil, os.ErrNotExist
+}
+
+// tryLoadFont attempts to load a font using the gg context's LoadFontFace method
+// This tries direct file path loading
+func tryLoadFont(dc *gg.Context, fontPath string, fontSize float64) error {
+	return dc.LoadFontFace(fontPath, fontSize)
+}
+
+// tryLoadFontFromBytes attempts to load a font from byte data
+// This requires parsing the font data directly (gg context doesn't support this natively,
+// so we create a temp file)
+func tryLoadFontFromBytes(dc *gg.Context, fontData []byte, fontSize float64) error {
+	// Create a temporary file for the font data
+	tmpFile, err := os.CreateTemp("", "font-*.ttf")
 	if err != nil {
-		log.Printf("warning: failed to load font face: %v", err)
+		return err
+	}
+	defer os.Remove(tmpFile.Name())
+
+	if _, err := tmpFile.Write(fontData); err != nil {
+		tmpFile.Close()
+		return err
+	}
+	tmpFile.Close()
+
+	return dc.LoadFontFace(tmpFile.Name(), fontSize)
+}
+
+// DrawTextInto draws text into the canvas using gg and supports wrapping and alignment
+// Supports loading fonts from filesystem, URLs, system fonts, or embedded resources
+// Font loading priority:
+//  1. If FontSource is specified, use that source explicitly
+//  2. If FontPath is provided, try filesystem
+//  3. If FontURL is provided, try downloading from URL
+//  4. If FontName is provided, try system fonts
+//  5. Use FONT_DIR/FONT_TTF environment variables
+//  6. Fall back to gg's builtin font
+//
+// Note: dc must be initialized with the correct size before calling this function
+// TODO: support vertical alignment
+// TODO: support more text options like line spacing, etc.
+func (slot Slot) DrawTextInto(dc *gg.Context, text string) {
+	// Load font if provided
+	var fontLoaded bool
+	opts := slot.TextOpts
+
+	// Determine font source priority
+	fontSource := strings.ToLower(opts.FontSource)
+
+	log.Printf("DrawTextInto: font source: %s", fontSource)
+
+	// Try explicit source first
+	if fontSource == "url" && opts.FontURL != "" {
+		if fontData, err := loadFontFromURL(opts.FontURL); err == nil {
+			if err := tryLoadFontFromBytes(dc, fontData, opts.FontSize); err == nil {
+				fontLoaded = true
+			} else {
+				log.Printf("warning: DrawTextInto: Failed to load font from URL %s: %v", opts.FontURL, err)
+			}
+		} else {
+			log.Printf("warning: DrawTextInto: Failed to download font from URL %s: %v", opts.FontURL, err)
+		}
+	} else if fontSource == "system" && opts.FontName != "" {
+		if fontData, err := loadFontFromSystem(opts.FontName); err == nil {
+			if err := tryLoadFontFromBytes(dc, fontData, opts.FontSize); err == nil {
+				fontLoaded = true
+			} else {
+				log.Printf("warning: DrawTextInto: Failed to load system font %s: %v", opts.FontName, err)
+			}
+		} else {
+			log.Printf("warning: DrawTextInto: Failed to find system font %s", opts.FontName)
+		}
+	} else if fontSource == "file" && opts.FontPath != "" {
+		if err := tryLoadFont(dc, opts.FontPath, opts.FontSize); err == nil {
+			fontLoaded = true
+		} else {
+			log.Printf("warning: DrawTextInto: Failed to load font from file %s: %v", opts.FontPath, err)
+		}
+	}
+
+	// If explicit source didn't work, try automatic discovery
+	if !fontLoaded {
+		log.Printf("warning: DrawTextInto: no explicit font source provided, trying automatic discovery")
+
+		// Try environment variables first
+		if !fontLoaded {
+			ttfFile := os.Getenv("ITENG_FONT_TTF")
+			if ttfFile != "" {
+				ttfPath := filepath.Join(os.Getenv("ITENG_FONT_DIR"), ttfFile)
+				if err := tryLoadFont(dc, ttfPath, opts.FontSize); err == nil {
+					fontLoaded = true
+				}
+			}
+		}
+
+		// Try filesystem path
+		if opts.FontPath != "" {
+			if err := tryLoadFont(dc, opts.FontPath, opts.FontSize); err == nil {
+				fontLoaded = true
+			}
+		}
+
+		// Try URL
+		if !fontLoaded && opts.FontURL != "" {
+			if fontData, err := loadFontFromURL(opts.FontURL); err == nil {
+				if err := tryLoadFontFromBytes(dc, fontData, opts.FontSize); err == nil {
+					fontLoaded = true
+				}
+			}
+		}
+
+		// Try system font by name
+		if !fontLoaded && opts.FontName != "" {
+			if fontData, err := loadFontFromSystem(opts.FontName); err == nil {
+				if err := tryLoadFontFromBytes(dc, fontData, opts.FontSize); err == nil {
+					fontLoaded = true
+				}
+			}
+		}
+	}
+
+	if !fontLoaded && opts.FontSize > 0 {
+		log.Printf("warning: DrawTextInto: Failed to load font: using builtin font")
 	}
 
 	// parse color
-	if slot.TextOpts.Color != "" {
-		// assume hex: #RRGGBB : slot.TextOpts.Color
-		dc.SetHexColor(slot.TextOpts.Color)
+	if opts.Color != "" {
+		// assume hex: #RRGGBB : opts.Color
+		dc.SetHexColor(opts.Color)
 	} else {
 		dc.SetRGB(0, 0, 0)
 	}
@@ -253,7 +403,7 @@ func (slot Slot) DrawTextInto(dc *gg.Context, text string) {
 	py := float64(slot.Y) + float64(slot.Height)*ay
 
 	// horizontal alignment mapping
-	hAlign := strings.ToLower(slot.TextOpts.AlignX)
+	hAlign := strings.ToLower(opts.AlignX)
 	var anchorX float64
 	switch hAlign {
 	case "center", "centre":
@@ -265,7 +415,7 @@ func (slot Slot) DrawTextInto(dc *gg.Context, text string) {
 	}
 
 	// vertical alignment mapping
-	vAlign := strings.ToLower(slot.TextOpts.AlignY)
+	vAlign := strings.ToLower(opts.AlignY)
 	var anchorY float64
 	switch vAlign {
 	case "middle", "center":
@@ -277,9 +427,9 @@ func (slot Slot) DrawTextInto(dc *gg.Context, text string) {
 	}
 
 	// wrapped or single-line
-	if slot.TextOpts.Wrap && slot.TextOpts.MaxWidth > 0 {
+	if opts.Wrap && opts.MaxWidth > 0 {
 		// DrawStringWrapped(x, y, ax, ay, width, lineSpacing, align)
-		dc.DrawStringWrapped(text, px, py, anchorX, anchorY, float64(slot.TextOpts.MaxWidth), 1.4, gg.AlignLeft)
+		dc.DrawStringWrapped(text, px, py, anchorX, anchorY, float64(opts.MaxWidth), 1.4, gg.AlignLeft)
 	} else {
 		dc.DrawStringAnchored(text, px, py, anchorX, anchorY)
 	}

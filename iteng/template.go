@@ -55,13 +55,16 @@ type Slot struct {
 
 // TextOpt defines text options for a Slot
 type TextOpt struct {
-	FontPath string  `json:"font_path,omitempty"`
-	FontSize float64 `json:"font_size,omitempty"`
-	Color    string  `json:"color,omitempty"`   // hex like #RRGGBB
-	AlignX   string  `json:"align_x,omitempty"` // left, center, right
-	AlignY   string  `json:"align_y,omitempty"` // top, middle, bottom
-	Wrap     bool    `json:"wrap,omitempty"`
-	MaxWidth int     `json:"max_width,omitempty"` // px for wrapping
+	FontPath   string  `json:"font_path,omitempty"`   // filesystem path
+	FontName   string  `json:"font_name,omitempty"`   // system font name (e.g., "Arial", "Helvetica")
+	FontSource string  `json:"font_source,omitempty"` // "file", "system", "url", "embedded", or "" for auto
+	FontURL    string  `json:"font_url,omitempty"`    // URL to download font from
+	FontSize   float64 `json:"font_size,omitempty"`
+	Color      string  `json:"color,omitempty"`   // hex like #RRGGBB
+	AlignX     string  `json:"align_x,omitempty"` // left, center, right
+	AlignY     string  `json:"align_y,omitempty"` // top, middle, bottom
+	Wrap       bool    `json:"wrap,omitempty"`
+	MaxWidth   int     `json:"max_width,omitempty"` // px for wrapping
 }
 
 // Template defines the base image, Output options, and Slots
