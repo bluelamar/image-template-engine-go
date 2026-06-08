@@ -2,6 +2,6 @@
   "motif": "./test/arrow_100x100.png",
   "title": "Introducing Text Rendering",
   "sub_title": "Flexible, Configurable & High-Quality",
-  "description": "This example shows how text rendering works",
+  "description": "This example shows how text rendering works with different fonts used in different slots",
   "footer": "Generated on 2025-02-15"
 }

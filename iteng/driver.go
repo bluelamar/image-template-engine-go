@@ -18,13 +18,26 @@ import (
 	"fmt"
 	"image"
 	"image/draw"
-	"os"
+	"log"
 	"path/filepath"
 	"strings"
 
 	"github.com/fogleman/gg"
 )
 
+/*
+ImageDriver is the main entry point for generating an image based on a template and inputs. It performs the following steps:
+1. Parses the template JSON file to get the base image, output options, and slot definitions.
+2. Parses the inputs JSON file to get the content for each slot.
+3. Loads the base image and creates a canvas for drawing.
+4. Iterates over each slot defined in the template:
+  - If it's a text slot, it draws the text using the specified options.
+  - If it's an image slot, it loads the input image, resizes it according to the slot's mode, applies opacity and masks if needed, and draws it onto the canvas at the correct position.
+
+5. Saves the final generated image to the specified output path in the desired format.
+
+This function abstracts away all the details of how images are loaded, resized, masked, and how text is drawn, providing a simple interface for users to generate images based on templates and inputs.
+*/
 func ImageDriver(templatePath string, inputsPath string, outputPath string) error {
 	tmpl, err := ParseTemplate(templatePath)
 	if err != nil {
@@ -47,10 +60,12 @@ func ImageDriver(templatePath string, inputsPath string, outputPath string) erro
 		// draw scaled base to fill canvas
 		scaledBase := ResizeImage(baseImg, tmpl.Output.Width, tmpl.Output.Height, ResizeModeFill)
 		draw.Draw(canvas, canvas.Bounds(), scaledBase, image.Point{0, 0}, draw.Src)
+		log.Printf("ImageDriver: drew scaled base image to fill canvas")
 	} else {
 		b := baseImg.Bounds()
 		canvas = image.NewRGBA(image.Rect(0, 0, b.Dx(), b.Dy()))
 		draw.Draw(canvas, canvas.Bounds(), baseImg, b.Min, draw.Src)
+		log.Printf("ImageDriver: drew base image")
 	}
 
 	dc := gg.NewContextForRGBA(canvas)
@@ -64,6 +79,7 @@ func ImageDriver(templatePath string, inputsPath string, outputPath string) erro
 
 		if slot.IsText {
 			// draw text in slot
+			log.Printf("ImageDriver: drawing text for slot %s", slot.ID)
 			slot.DrawTextInto(dc, val)
 			continue
 		}
@@ -72,7 +88,7 @@ func ImageDriver(templatePath string, inputsPath string, outputPath string) erro
 		imgPath := val
 		img, err := LoadImageFromFile(imgPath)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "warning: failed to load image for slot %s: %v", slot.ID, err)
+			log.Printf("warning: failed to load image for slot %s: %v", slot.ID, err)
 			continue
 		}
 
@@ -80,6 +96,8 @@ func ImageDriver(templatePath string, inputsPath string, outputPath string) erro
 		if mode == "" {
 			mode = ResizeModeFit
 		}
+
+		log.Printf("ImageDriver: processing image for slot %s with mode %s", slot.ID, mode)
 
 		resized := ResizeImage(img, slot.Width, slot.Height, mode)
 		// apply opacity
@@ -125,7 +143,7 @@ func ImageDriver(templatePath string, inputsPath string, outputPath string) erro
 		return fmt.Errorf("saving output image: %v", ret)
 	}
 
-	//log.Printf("Generated image saved to: %s", outputPath)
+	log.Printf("Generated image saved to: %s", outputPath)
 
 	return nil
 }

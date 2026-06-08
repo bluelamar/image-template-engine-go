@@ -14,9 +14,12 @@ the layout and slots, an inputs JSON file that provides the content for those
 slots, and generates the final image saved to the specified output path.
 */
 func main() {
-	templatePath := "resources/test_template.json"
-	inputsPath := "resources/test_inputs.json"
-	outputPath := "output/generated_image.png"
+	// The template JSON file should define the base image, output options, and slots with text options.
+	templatePath := "test/example_template.json"
+	// The inputs JSON file should provide the image and/or text content for each slot defined in the template.
+	inputsPath := "test/example_input.json"
+	// The output path where the generated image will be saved.
+	outputPath := "/tmp/generated_image.png"
 
 	err := iteng.ImageDriver(templatePath, inputsPath, outputPath)
 	if err != nil {

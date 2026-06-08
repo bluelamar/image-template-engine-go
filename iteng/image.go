@@ -330,56 +330,93 @@ func (slot Slot) DrawTextInto(dc *gg.Context, text string) {
 			log.Printf("warning: DrawTextInto: Failed to find system font %s", opts.FontName)
 		}
 	} else if fontSource == "file" && opts.FontPath != "" {
-		if err := tryLoadFont(dc, opts.FontPath, opts.FontSize); err == nil {
-			fontLoaded = true
-		} else {
+		if err := tryLoadFont(dc, opts.FontPath, opts.FontSize); err != nil {
 			log.Printf("warning: DrawTextInto: Failed to load font from file %s: %v", opts.FontPath, err)
+		} else {
+			fontLoaded = true
 		}
 	}
 
 	// If explicit source didn't work, try automatic discovery
 	if !fontLoaded {
-		log.Printf("warning: DrawTextInto: no explicit font source provided, trying automatic discovery")
+		log.Printf("warning: DrawTextInto: No explicit font source available or provided, trying automatic discovery")
 
 		// Try environment variables first
 		if !fontLoaded {
 			ttfFile := os.Getenv("ITENG_FONT_TTF")
 			if ttfFile != "" {
 				ttfPath := filepath.Join(os.Getenv("ITENG_FONT_DIR"), ttfFile)
-				if err := tryLoadFont(dc, ttfPath, opts.FontSize); err == nil {
+				if err := tryLoadFont(dc, ttfPath, opts.FontSize); err != nil {
+					log.Printf("warning: DrawTextInto: Failed to load font from file %s: %v", ttfPath, err)
+				} else {
+					log.Printf("DrawTextInto: loaded font from environment variable path %s", ttfPath)
 					fontLoaded = true
 				}
 			}
 		}
 
 		// Try filesystem path
-		if opts.FontPath != "" {
-			if err := tryLoadFont(dc, opts.FontPath, opts.FontSize); err == nil {
+		if !fontLoaded && opts.FontPath != "" {
+			if err := tryLoadFont(dc, opts.FontPath, opts.FontSize); err != nil {
+				log.Printf("warning: DrawTextInto: Failed to load font from file %s: %v", opts.FontPath, err)
+			} else {
 				fontLoaded = true
 			}
 		}
 
 		// Try URL
 		if !fontLoaded && opts.FontURL != "" {
-			if fontData, err := loadFontFromURL(opts.FontURL); err == nil {
-				if err := tryLoadFontFromBytes(dc, fontData, opts.FontSize); err == nil {
-					fontLoaded = true
-				}
+			if fontData, err := loadFontFromURL(opts.FontURL); err != nil {
+				log.Printf("warning: DrawTextInto: Failed to download font from URL %s: %v", opts.FontURL, err)
+			} else if err := tryLoadFontFromBytes(dc, fontData, opts.FontSize); err != nil {
+				log.Printf("warning: DrawTextInto: Failed to load font from URL %s: %v", opts.FontURL, err)
+			} else {
+				fontLoaded = true
 			}
 		}
 
 		// Try system font by name
 		if !fontLoaded && opts.FontName != "" {
-			if fontData, err := loadFontFromSystem(opts.FontName); err == nil {
-				if err := tryLoadFontFromBytes(dc, fontData, opts.FontSize); err == nil {
-					fontLoaded = true
-				}
+			if fontData, err := loadFontFromSystem(opts.FontName); err != nil {
+				log.Printf("warning: DrawTextInto: Failed to find system font: %s: %v", opts.FontName, err)
+			} else if err := tryLoadFontFromBytes(dc, fontData, opts.FontSize); err != nil {
+				log.Printf("warning: DrawTextInto: Failed to load system font by name: %s: %v", opts.FontName, err)
+			} else {
+				fontLoaded = true
 			}
 		}
 	}
 
-	if !fontLoaded && opts.FontSize > 0 {
-		log.Printf("warning: DrawTextInto: Failed to load font: using builtin font")
+	if !fontLoaded {
+		// fallback to common system font names
+		fallback := []string{"DejaVuSans", "LiberationSans", "NotoSans", "Arial", "Helvetica"}
+		for _, name := range fallback {
+			if fontData, err := loadFontFromSystem(name); err == nil {
+				if err := tryLoadFontFromBytes(dc, fontData, opts.FontSize); err == nil {
+					fontLoaded = true
+					log.Printf("DrawTextInto: loaded fallback system font %s", name)
+					break
+				}
+			}
+		}
+
+		// try bundled fallback font files (relative paths)
+		if !fontLoaded && opts.FontSize > 0 {
+			fallbackFiles := []string{"test/LastResort.otf", "../test/LastResort.otf"}
+			for _, fp := range fallbackFiles {
+				if err := tryLoadFont(dc, fp, opts.FontSize); err == nil {
+					fontLoaded = true
+					log.Printf("DrawTextInto: loaded fallback font file %s", fp)
+					break
+				}
+			}
+		}
+
+		if !fontLoaded && opts.FontSize > 0 {
+			log.Printf("warning: DrawTextInto: Failed to load font: using builtin font")
+		}
+	} else {
+		// font already loaded
 	}
 
 	// parse color
@@ -427,10 +464,16 @@ func (slot Slot) DrawTextInto(dc *gg.Context, text string) {
 	}
 
 	// wrapped or single-line
-	if opts.Wrap && opts.MaxWidth > 0 {
+	if opts.Wrap && opts.Wrap == true {
+		log.Printf("DrawTextInto: drawing wrapped text with max width %f", float64(opts.MaxWidth))
+		if opts.MaxWidth <= 0 {
+			log.Printf("warning: DrawTextInto: wrap enabled but max_width not set or <= 0, defaulting to slot width")
+			opts.MaxWidth = slot.Width
+		}
 		// DrawStringWrapped(x, y, ax, ay, width, lineSpacing, align)
 		dc.DrawStringWrapped(text, px, py, anchorX, anchorY, float64(opts.MaxWidth), 1.4, gg.AlignLeft)
 	} else {
+		log.Printf("DrawTextInto: drawing single-line text")
 		dc.DrawStringAnchored(text, px, py, anchorX, anchorY)
 	}
 }
