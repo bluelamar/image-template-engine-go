@@ -55,4 +55,4 @@ See https://github.com/bluelamar/image-template-engine-go/tree/main/examples
 
 See the function **ImageDriver** in https://github.com/bluelamar/image-template-engine-go/tree/master/iteng/driver.go to see how to use the API.
 
-
+The example main can be run with the script `bin/run_example.sh`.

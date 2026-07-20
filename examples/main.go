@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/bluelamar/image-template-engine-go/iteng"
 )
@@ -15,13 +16,27 @@ slots, and generates the final image saved to the specified output path.
 */
 func main() {
 	// The template JSON file should define the base image, output options, and slots with text options.
-	templatePath := "test/example_template.json"
-	// The inputs JSON file should provide the image and/or text content for each slot defined in the template.
-	inputsPath := "test/example_input.json"
-	// The output path where the generated image will be saved.
-	outputPath := "/tmp/generated_image.png"
+	templatePath := os.Getenv("ITENG_EX_TEMPL")
+	if templatePath == "" {
+		templatePath = "test/example_template.json"
+	}
 
-	err := iteng.ImageDriver(templatePath, inputsPath, outputPath)
+	log.Printf("Template file=%s\n", templatePath)
+
+	// The inputs JSON file should provide the image and/or text content for each slot defined in the template.
+	inputsPath := os.Getenv("ITENG_EX_INPUTS")
+	if inputsPath == "" {
+		inputsPath = "test/example_input.json"
+	}
+
+	log.Printf("Inputs file=%s\n", inputsPath)
+
+	// The output path where the generated image will be saved.
+	outputPath := "/tmp/generated_image"
+
+	log.Printf("Output path=%s\n", outputPath)
+
+	err, outputPath := iteng.ImageDriver(templatePath, inputsPath, outputPath)
 	if err != nil {
 		log.Fatalf("Failed to generate image: %v", err)
 	}

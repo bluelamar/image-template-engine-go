@@ -37,21 +37,23 @@ ImageDriver is the main entry point for generating an image based on a template 
 5. Saves the final generated image to the specified output path in the desired format.
 
 This function abstracts away all the details of how images are loaded, resized, masked, and how text is drawn, providing a simple interface for users to generate images based on templates and inputs.
+
+Returns an error if any step fails, along with the final output path of the generated image.
 */
-func ImageDriver(templatePath string, inputsPath string, outputPath string) error {
+func ImageDriver(templatePath string, inputsPath string, outputPath string) (error, string) {
 	tmpl, err := ParseTemplate(templatePath)
 	if err != nil {
-		return fmt.Errorf("parsing template: %v", err)
+		return fmt.Errorf("parsing template: %v", err), ""
 	}
 
 	inputs, err := ParseInputs(inputsPath)
 	if err != nil {
-		return fmt.Errorf("parsing inputs: %v", err)
+		return fmt.Errorf("parsing inputs: %v", err), ""
 	}
 
 	baseImg, err := LoadImageFromFile(tmpl.TemplateImage)
 	if err != nil {
-		return fmt.Errorf("loading base image: %v", err)
+		return fmt.Errorf("loading base image: %v", err), ""
 	}
 
 	var canvas *image.RGBA
@@ -137,13 +139,15 @@ func ImageDriver(templatePath string, inputsPath string, outputPath string) erro
 			outFormat = "png"
 		}
 	}
+	outputPath = strings.TrimSuffix(outputPath, filepath.Ext(outputPath)) + "." + outFormat
+	log.Printf("ImageDriver: saving output image to %s with format %s", outputPath, outFormat)
 
 	ret := SaveImageToFile(canvas, outputPath, outFormat)
 	if ret != nil {
-		return fmt.Errorf("saving output image: %v", ret)
+		return fmt.Errorf("saving output image: %v", ret), ""
 	}
 
 	log.Printf("Generated image saved to: %s", outputPath)
 
-	return nil
+	return nil, outputPath
 }
