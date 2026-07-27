@@ -1,5 +1,5 @@
 {
-  "template_image": "test/sun_and_moon_100x100.png",
+  "template_image": "testdata/sun_and_moon_100x100.png",
   "output": {
     "width": 1024,
     "height": 600,

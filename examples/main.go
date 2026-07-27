@@ -18,7 +18,7 @@ func main() {
 	// The template JSON file should define the base image, output options, and slots with text options.
 	templatePath := os.Getenv("ITENG_EX_TEMPL")
 	if templatePath == "" {
-		templatePath = "test/example_template.json"
+		templatePath = "testdata/example_template.json"
 	}
 
 	log.Printf("Template file=%s\n", templatePath)
@@ -26,7 +26,7 @@ func main() {
 	// The inputs JSON file should provide the image and/or text content for each slot defined in the template.
 	inputsPath := os.Getenv("ITENG_EX_INPUTS")
 	if inputsPath == "" {
-		inputsPath = "test/example_input.json"
+		inputsPath = "testdata/example_input.json"
 	}
 
 	log.Printf("Inputs file=%s\n", inputsPath)
