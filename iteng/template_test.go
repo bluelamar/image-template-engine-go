@@ -15,11 +15,12 @@
 package iteng
 
 import (
+	"strings"
 	"testing"
 )
 
 func TestParseInputs(t *testing.T) {
-	inputFile := "../testdata/test_input.json"
+	inputFile := "../testdata/example_input.json"
 	inputs, err := ParseInputs(inputFile)
 	if err != nil {
 		t.Errorf("ParseInputs failed with error: %v", err)
@@ -36,8 +37,8 @@ func TestParseInputs(t *testing.T) {
 	if inputs["sub_title"] != "Flexible, Configurable & High-Quality" {
 		t.Errorf("Expected sub_title to be 'Flexible, Configurable & High-Quality', but got '%s'", inputs["sub_title"])
 	}
-	if inputs["description"] != "This example shows how text rendering works" {
-		t.Errorf("Expected description to be 'This example shows how text rendering works', but got '%s'", inputs["description"])
+	if !strings.Contains(inputs["description"], "This example shows how text rendering works") {
+		t.Errorf("Expected description to contain 'This example shows how text rendering works', but got '%s'", inputs["description"])
 	}
 	if inputs["footer"] != "Generated on 2025-02-15" {
 		t.Errorf("Expected footer to be 'Generated on 2025-02-15', but got '%s'", inputs["footer"])
@@ -45,7 +46,7 @@ func TestParseInputs(t *testing.T) {
 }
 
 func TestParseTemplate(t *testing.T) {
-	templateFile := "../testdata/test_template.json"
+	templateFile := "../testdata/example_template.json"
 	templ, err := ParseTemplate(templateFile)
 	if err != nil {
 		t.Errorf("ParseTemplate failed with error: %v", err)

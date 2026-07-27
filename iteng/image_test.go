@@ -147,7 +147,7 @@ func Test_LoadImageFromFile(t *testing.T) {
 	}
 
 	// Invalid image file format
-	imagePath = "../testdata/test_template.json"
+	imagePath = "../testdata/example_template.json"
 	_, err = LoadImageFromFile(imagePath)
 	if err != nil {
 		t.Logf("Success: LoadImageFromFile(%s) returned error: %v", imagePath, err)
