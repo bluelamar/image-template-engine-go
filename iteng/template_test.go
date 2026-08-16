@@ -21,7 +21,7 @@ import (
 
 func TestParseInputs(t *testing.T) {
 	inputFile := "../testdata/example_input.json"
-	inputs, err := ParseInputs(inputFile)
+	inputs, err := ParseInputsFromPath(inputFile)
 	if err != nil {
 		t.Errorf("ParseInputs failed with error: %v", err)
 	}

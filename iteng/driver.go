@@ -32,11 +32,13 @@ ImageDriver is the main entry point for generating an image based on a template 
 3. Loads the base image and creates a canvas for drawing.
 4. Iterates over each slot defined in the template:
   - If it's a text slot, it draws the text using the specified options.
-  - If it's an image slot, it loads the input image, resizes it according to the slot's mode, applies opacity and masks if needed, and draws it onto the canvas at the correct position.
+  - If it's an image slot, it loads the input image, resizes it according to the slot's mode, applies opacity and masks if needed,
+    and draws it onto the canvas at the correct position.
 
 5. Saves the final generated image to the specified output path in the desired format.
 
-This function abstracts away all the details of how images are loaded, resized, masked, and how text is drawn, providing a simple interface for users to generate images based on templates and inputs.
+This function abstracts away all the details of how images are loaded, resized, masked, and how text is drawn,
+providing a simple interface for users to generate images based on templates and inputs.
 
 Returns an error if any step fails, along with the final output path of the generated image.
 */
@@ -46,11 +48,53 @@ func ImageDriver(templatePath string, inputsPath string, outputPath string) (err
 		return fmt.Errorf("parsing template: %v", err), ""
 	}
 
-	inputs, err := ParseInputs(inputsPath)
+	inputs, err := ParseInputsFromPath(inputsPath)
 	if err != nil {
 		return fmt.Errorf("parsing inputs: %v", err), ""
 	}
 
+	err, outputPath = GenerateImage(tmpl, inputs, outputPath)
+	if err != nil {
+		return fmt.Errorf("generating image: %v", err), ""
+	}
+
+	return nil, outputPath
+}
+
+/*
+ * ImageDriverFromInputBytes is similar to ImageDriver, but it takes the inputs as a byte slice instead of a file path.
+ * This allows for more flexibility in how the inputs are provided, such as reading from an HTTP request body or other sources.
+ *
+ * The function performs the same steps as ImageDriver, but it uses ParseInputsFromBytes to parse the inputs directly from the provided byte slice.
+ *
+ * Returns an error if any step fails, along with the final output path of the generated image.
+ */
+func ImageDriverFromInputBytes(templatePath string, inputsBytes []byte, outputPath string) (error, string) {
+	tmpl, err := ParseTemplate(templatePath)
+	if err != nil {
+		return fmt.Errorf("parsing template: %v", err), ""
+	}
+
+	inputs, err := ParseInputsFromBytes(inputsBytes)
+	if err != nil {
+		return fmt.Errorf("parsing inputs: %v", err), ""
+	}
+
+	err, outputPath = GenerateImage(tmpl, inputs, outputPath)
+	if err != nil {
+		return fmt.Errorf("generating image: %v", err), ""
+	}
+
+	return nil, outputPath
+}
+
+/*
+ * GenerateImage takes a parsed Template, Inputs, and an output path, and generates the final image according to the template and inputs.
+ * It handles loading the base image, creating a canvas, processing each slot (text or image), applying resizing, opacity, and masks as needed, and finally saving the output image.
+ *
+ * Returns an error if any step fails, along with the final output path of the generated image.
+ */
+func GenerateImage(tmpl *Template, inputs Inputs, outputPath string) (error, string) {
 	baseImg, err := LoadImageFromFile(tmpl.TemplateImage)
 	if err != nil {
 		return fmt.Errorf("loading base image: %v", err), ""

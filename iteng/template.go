@@ -96,12 +96,17 @@ func ParseTemplate(path string) (*Template, error) {
 }
 
 // ParseInputs reads and parses the JSON Inputs file
-func ParseInputs(path string) (Inputs, error) {
+func ParseInputsFromPath(path string) (Inputs, error) {
 	b, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
 
+	return ParseInputsFromBytes(b)
+}
+
+// ParseInputsFromBytes parses the JSON Inputs from a byte slice
+func ParseInputsFromBytes(b []byte) (Inputs, error) {
 	var in Inputs
 	if err := json.Unmarshal(b, &in); err != nil {
 		return nil, err
