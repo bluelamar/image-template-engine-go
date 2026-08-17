@@ -90,7 +90,12 @@ func ImageDriverFromInputBytes(templatePath string, inputsBytes []byte, outputPa
 
 /*
  * GenerateImage takes a parsed Template, Inputs, and an output path, and generates the final image according to the template and inputs.
- * It handles loading the base image, creating a canvas, processing each slot (text or image), applying resizing, opacity, and masks as needed, and finally saving the output image.
+ * It handles loading the base image, creating a canvas, processing each slot (text or image), applying resizing, opacity,
+ * and masks as needed, and finally saving the output image.
+ *
+ * Note that if the output format is not specified in the template, it will be inferred from the output path's file extension.
+ * So if the outputPath specified is "/tmp/generated_image", and the template base image is PNG, the output format will be "png".
+ * If the template base image is JPG then the output path will be "/tmp/generated_image.jpg".
  *
  * Returns an error if any step fails, along with the final output path of the generated image.
  */

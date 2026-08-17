@@ -1,6 +1,6 @@
 module github.com/bluelamar/image-template-engine-go
 
-go 1.24.5
+go 1.25
 
 require (
 	github.com/fogleman/gg v1.3.0

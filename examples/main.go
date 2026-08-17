@@ -32,6 +32,8 @@ func main() {
 	log.Printf("Inputs file=%s\n", inputsPath)
 
 	// The output path where the generated image will be saved.
+	// Note that the output format (e.g., PNG, JPEG) is determined by the template's output settings.
+	// So the final output file path returned would be "/tmp/generated_image.png" or "/tmp/generated_image.jpg" depending on the template's output format.
 	outputPath := "/tmp/generated_image"
 
 	log.Printf("Output path=%s\n", outputPath)
