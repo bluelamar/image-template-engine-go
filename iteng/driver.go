@@ -63,7 +63,6 @@ func ImageDriver(templatePath string, inputsPath string, outputPath string) (err
 
 /*
  * ImageDriverFromInputBytes is similar to ImageDriver, but it takes the inputs as a byte slice instead of a file path.
- * This allows for more flexibility in how the inputs are provided, such as reading from an HTTP request body or other sources.
  *
  * The function performs the same steps as ImageDriver, but it uses ParseInputsFromBytes to parse the inputs directly from the provided byte slice.
  *
@@ -71,6 +70,58 @@ func ImageDriver(templatePath string, inputsPath string, outputPath string) (err
  */
 func ImageDriverFromInputBytes(templatePath string, inputsBytes []byte, outputPath string) (error, string) {
 	tmpl, err := ParseTemplate(templatePath)
+	if err != nil {
+		return fmt.Errorf("parsing template: %v", err), ""
+	}
+
+	inputs, err := ParseInputsFromBytes(inputsBytes)
+	if err != nil {
+		return fmt.Errorf("parsing inputs: %v", err), ""
+	}
+
+	err, outputPath = GenerateImage(tmpl, inputs, outputPath)
+	if err != nil {
+		return fmt.Errorf("generating image: %v", err), ""
+	}
+
+	return nil, outputPath
+}
+
+/*
+ * ImageDriverFromTemplateBytes is similar to ImageDriver, but it takes the template as a byte slice instead of a file path.
+ *
+ * The function performs the same steps as ImageDriver, but it uses ParseTemplateFromBytes to parse the template directly from the provided byte slice.
+ *
+ * Returns an error if any step fails, along with the final output path of the generated image.
+ */
+func ImageDriverFromTemplateBytes(templateBytes []byte, inputsPath string, outputPath string) (error, string) {
+	tmpl, err := ParseTemplateFromBytes(templateBytes)
+	if err != nil {
+		return fmt.Errorf("parsing template: %v", err), ""
+	}
+
+	inputs, err := ParseInputsFromPath(inputsPath)
+	if err != nil {
+		return fmt.Errorf("parsing inputs: %v", err), ""
+	}
+
+	err, outputPath = GenerateImage(tmpl, inputs, outputPath)
+	if err != nil {
+		return fmt.Errorf("generating image: %v", err), ""
+	}
+
+	return nil, outputPath
+}
+
+/*
+ * ImageDriverFromTemplateAndInputBytes is similar to ImageDriver, but it takes the template and inputs as byte slices instead of file paths.
+ *
+ * The function performs the same steps as ImageDriver, but it uses ParseTemplateFromBytes to parse the template directly from the provided byte slice and ParseInputsFromBytes to parse the inputs.
+ *
+ * Returns an error if any step fails, along with the final output path of the generated image.
+ */
+func ImageDriverFromTemplateAndInputBytes(templateBytes []byte, inputsBytes []byte, outputPath string) (error, string) {
+	tmpl, err := ParseTemplateFromBytes(templateBytes)
 	if err != nil {
 		return fmt.Errorf("parsing template: %v", err), ""
 	}
@@ -120,6 +171,8 @@ func GenerateImage(tmpl *Template, inputs Inputs, outputPath string) (error, str
 	}
 
 	dc := gg.NewContextForRGBA(canvas)
+	// TODO return the width and height of the final image in the return value
+	log.Printf("ImageDriver: canvas dimensions: w=%d x h=%d", dc.Width(), dc.Height())
 
 	// Process slots
 	for _, slot := range tmpl.Slots {

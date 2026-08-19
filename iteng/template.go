@@ -95,6 +95,15 @@ func ParseTemplate(path string) (*Template, error) {
 	return &t, nil
 }
 
+// ParseTemplateFromBytes translates from a byte slice of bytes that represent the JSON data into a Template struct
+func ParseTemplateFromBytes(b []byte) (*Template, error) {
+	var templ Template
+	if err := json.Unmarshal(b, &templ); err != nil {
+		return nil, err
+	}
+	return &templ, nil
+}
+
 // ParseInputs reads and parses the JSON Inputs file
 func ParseInputsFromPath(path string) (Inputs, error) {
 	b, err := os.ReadFile(path)
@@ -105,7 +114,7 @@ func ParseInputsFromPath(path string) (Inputs, error) {
 	return ParseInputsFromBytes(b)
 }
 
-// ParseInputsFromBytes parses the JSON Inputs from a byte slice
+// ParseInputsFromBytes translates from a byte slice of bytes that represent the JSON data into an Inputs struct
 func ParseInputsFromBytes(b []byte) (Inputs, error) {
 	var in Inputs
 	if err := json.Unmarshal(b, &in); err != nil {
